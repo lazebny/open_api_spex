@@ -37,8 +37,24 @@ defmodule OpenApiSpex.CastAllOfTest do
     end
 
     test "allOf, for inheritance schema" do
+      defmodule NamedEntity do
+        require OpenApiSpex
+        alias OpenApiSpex.{Schema}
+
+        OpenApiSpex.schema(%{
+          title: "NamedEntity",
+          description: "Anything with a name",
+          type: :object,
+          properties: %{
+            name: %Schema{type: :string}
+          },
+          required: [:name]
+        })
+      end
+
       schema = %Schema{
         allOf: [
+          NamedEntity,
           %Schema{
             type: :object,
             properties: %{
@@ -58,7 +74,7 @@ defmodule OpenApiSpex.CastAllOfTest do
         ]
       }
 
-      value = %{id: "e30aee0f-dbda-40bd-9198-6cf609b8b640", bar: "foo"}
+      value = %{id: "e30aee0f-dbda-40bd-9198-6cf609b8b640", bar: "foo", name: "Elizabeth"}
 
       assert {:ok, %{id: "e30aee0f-dbda-40bd-9198-6cf609b8b640", bar: "foo"}} =
                cast(value: value, schema: schema)
